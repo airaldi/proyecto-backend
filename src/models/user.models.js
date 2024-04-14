@@ -26,6 +26,9 @@ const userSchema = Schema({
         type: String,
         enum: ["ADMIN", "USER"],
         default: "USER"
+    },
+    crypto: {
+        type: String
     }
 })
 

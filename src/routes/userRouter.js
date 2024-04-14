@@ -1,5 +1,5 @@
 const express = require('express');
-const { createUserController, getUserbyUsernameController, updateUserController, deleteUserController } = require('../controller/userController');
+const { createUserController, getUserbyUsernameController, updateUserController, deleteUserController, getCryptoPriceController } = require('../controller/userController');
 const validatorMiddleware = require('../utils/validator');
 const {check} = require("express-validator");
 const repeatPasswordMiddleware = require('../utils/repeatPasswordMiddleware');
@@ -56,5 +56,7 @@ userRouter.delete(
     '/:username', 
     deleteUserController 
 );
+
+userRouter.get('/crypto/:username', getCryptoPriceController);
 
 module.exports = userRouter;
