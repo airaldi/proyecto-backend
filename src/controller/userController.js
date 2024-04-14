@@ -1,4 +1,5 @@
-const {createUserService, getUserbyUsernameService} = require("../services/userService");
+const {createUserService, getUserbyUsernameService , updateUserService, deleteUserService}= require("../services/userService");
+const { getCryptoPriceService } = require("../services/cryptoService");
 
 const validateStatus = async (res, user, status) => {
     if(user.status === status) 
@@ -17,16 +18,53 @@ const createUserController = async (req, res) => {
     res.status(201).json(user);
 }
 
-//const updateUserController = async (req, res) => {
-//    const updatedUser = await updateUserService(req);
+const updateUserController = async (req, res) => {
+    try {
+        const username = req.params.username; 
+        const updatedUser = await updateUserService(username, req.body); 
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+}
 
-//    res.json(updatedUser);
-//}
+const deleteUserController = async (req, res) => {
+    try {
+        const username = req.params.username; 
+        const deletedUser = await deleteUserService(username); 
+        res.status(200).json(deletedUser);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+}
 
-//const deleteUserController = async (req, res) => {
-//    const deletedUser = await deleteUserService(req);
+const getCryptoPriceController = async (req, res) => {
+    try {
+        const { username } = req.params;
+        
+        // Obtener el usuario
+        const user = await getUserbyUsernameService(req, res);
+        
+        if (user.error) {
+            return res.status(user.status).json(user);
+        }
+        
+        // Obtener el campo `crypto` del usuario
+        const crypto = user.crypto;
 
-//    res.json(deletedUser);
-//}
+        if (!crypto) {
+            return res.status(404).json({ error: "El usuario no tiene criptomoneda asociada" });
+        }
 
-module.exports = {createUserController, getUserbyUsernameController};
+        // Obtener el precio de la criptomoneda
+        const price = await getCryptoPriceService(crypto);
+        
+        res.status(200).json({ crypto, price });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+console.log(typeof getCryptoPriceService);
+
+module.exports = {createUserController, getUserbyUsernameController,updateUserController,deleteUserController, getCryptoPriceController};
